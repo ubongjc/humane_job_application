@@ -109,6 +109,7 @@ model Candidate {
 
   job       Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
   decisions Decision[]
+  appeals   Appeal[]
 
   @@unique([jobId, email])
   @@index([jobId])
@@ -145,18 +146,24 @@ model Decision {
   generatedLetter  String?        @db.Text
   sentAt           DateTime?
   letterTemplate   String?        // Reference to template used
+  templateVersion  String?        // Template version for audit trail
   biasCheckPassed  Boolean        @default(false)
+  idempotencyKey   String?        // For idempotent operations
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
   job       Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
   candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  receipt   ExplainableReceipt?
+  appeals   Appeal[]
 
+  @@unique([candidateId, idempotencyKey])
   @@index([jobId])
   @@index([candidateId])
   @@index([outcome])
   @@index([sentAt])
+  @@index([idempotencyKey])
 }
 
 enum DecisionOutcome {
@@ -280,4 +287,117 @@ enum ExportStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+// ExplainableReceipt stores cryptographic hash of decision for audit trail
+model ExplainableReceipt {
+  id          String   @id @default(cuid())
+  decisionId  String   @unique
+  hash        String   // SHA-256 of {letter, reasons, templateVersion, rubricDeltas}
+  explainable Json     @db.JsonB // Explainable Feedback Card data
+  version     String   @default("1.0")
+  createdAt   DateTime @default(now())
+
+  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
+  @@index([decisionId])
+  @@index([hash])
+}
+
+// Appeal represents a candidate clarification request
+model Appeal {
+  id          String       @id @default(cuid())
+  decisionId  String
+  candidateId String
+  question    String       @db.Text
+  status      AppealStatus @default(PENDING)
+  response    String?      @db.Text
+  respondedBy String?
+  dueAt       DateTime?    // SLA deadline
+  thread      Json?        @db.JsonB // Conversation history
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  decision  Decision  @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@index([decisionId])
+  @@index([candidateId])
+  @@index([status])
+  @@index([dueAt])
+}
+
+enum AppealStatus {
+  PENDING
+  RESPONDED
+  CLOSED
+  EXPIRED
+}
+
+// FeatureFlag for per-tenant feature toggles
+model FeatureFlag {
+  id        String   @id @default(cuid())
+  companyId String
+  key       String   // e.g., "explainable_cards", "appeals_enabled"
+  value     Json     @db.JsonB // Boolean, string, object, etc.
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([companyId, key])
+  @@index([companyId])
+  @@index([key])
+}
+
+// JurisdictionPack encapsulates locale-specific rules and configuration
+model JurisdictionPack {
+  id          String   @id @default(cuid())
+  code        String   @unique // US, EU, CA, UK, etc.
+  version     String   // Semver for tracking changes
+  name        String
+  config      Json     @db.JsonB // Holidays, send-time rules, legal disclaimers, wording
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+  @@index([version])
+}
+
+// BulkOperation tracks bulk letter generation/send operations
+model BulkOperation {
+  id             String              @id @default(cuid())
+  companyId      String
+  authorId       String
+  type           BulkOperationType
+  idempotencyKey String?             @unique
+  candidateCount Int
+  successCount   Int                 @default(0)
+  errorCount     Int                 @default(0)
+  status         BulkOperationStatus @default(PENDING)
+  errors         Json?               @db.JsonB // First 10 errors
+  metadata       Json?               @db.JsonB // Job ID, template, etc.
+  completedAt    DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([companyId])
+  @@index([authorId])
+  @@index([idempotencyKey])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum BulkOperationType {
+  LETTER_GENERATE
+  LETTER_SEND
+  CANDIDATE_IMPORT
+  DATA_EXPORT
+}
+
+enum BulkOperationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  PARTIAL
 }
