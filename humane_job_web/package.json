@@ -66,7 +66,11 @@
     "express-rate-limit": "^7.4.1",
     "dompurify": "^3.2.2",
     "isomorphic-dompurify": "^2.17.0",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "web-vitals": "^4.2.4",
+    "sonner": "^1.7.1",
+    "redis": "^4.7.0",
+    "ioredis": "^5.4.1"
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.16",

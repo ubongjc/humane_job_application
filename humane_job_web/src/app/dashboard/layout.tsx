@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { DashboardNav } from "@/components/dashboard/nav";
+import { DashboardFeatures } from "@/components/dashboard-features";
 
 export default async function DashboardLayout({
   children,
@@ -32,6 +33,9 @@ export default async function DashboardLayout({
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
+
+      {/* Dashboard Features: AI Copilot, Command Palette, Keyboard Shortcuts */}
+      <DashboardFeatures context={{ page: "dashboard" }} />
     </div>
   );
 }
