@@ -1,0 +1,86 @@
+{
+  "type": "candidate.stage_change",
+  "occurred_at": "2024-01-20T20:15:00.000Z",
+  "company_id": "breezy_company_12345",
+  "data": {
+    "candidate": {
+      "_id": "breezy_cand_abcd1234",
+      "name": "Emily Rodriguez",
+      "email_address": "emily.rodriguez@example.com",
+      "phone_number": "+1-555-741-8520",
+      "address": {
+        "city": "Seattle",
+        "state": "WA",
+        "zip": "98101",
+        "country": "US"
+      },
+      "headline": "Senior Marketing Manager",
+      "summary": "10+ years experience in B2B SaaS marketing",
+      "resume_url": "https://breezy.hr/resumes/abcd1234.pdf",
+      "social_profiles": {
+        "linkedin": "https://linkedin.com/in/emilyrodriguez",
+        "twitter": "https://twitter.com/emily_mktg"
+      },
+      "tags": ["marketing", "saas", "demand-gen"],
+      "source": "LinkedIn",
+      "created": "2024-01-08T14:00:00.000Z",
+      "updated": "2024-01-20T20:15:00.000Z"
+    },
+    "position": {
+      "_id": "breezy_pos_xyz789",
+      "name": "Director of Marketing",
+      "department": "Marketing",
+      "location": {
+        "city": "Seattle",
+        "state": "WA",
+        "country": "US"
+      },
+      "type": "full_time",
+      "state": "published",
+      "requisition_id": "MKT-2024-001",
+      "hiring_manager": {
+        "_id": "breezy_user_999",
+        "name": "Robert Kim",
+        "email": "robert.kim@company.com"
+      }
+    },
+    "stage": {
+      "_id": "stage_hired",
+      "name": "Hired",
+      "color": "#00C853"
+    },
+    "previous_stage": {
+      "_id": "stage_offer",
+      "name": "Offer Extended",
+      "color": "#2196F3"
+    },
+    "meta": {
+      "moved_by": {
+        "_id": "breezy_user_999",
+        "name": "Robert Kim",
+        "email": "robert.kim@company.com"
+      },
+      "moved_at": "2024-01-20T20:15:00.000Z",
+      "notes": "Accepted offer. Start date: Feb 15, 2024",
+      "rating": 5,
+      "disposition": "hire"
+    },
+    "scorecards": [
+      {
+        "scorecard_id": "sc_12345",
+        "completed_by": {
+          "name": "Robert Kim",
+          "email": "robert.kim@company.com"
+        },
+        "completed_at": "2024-01-18T16:00:00.000Z",
+        "overall_rating": 5,
+        "recommendation": "Strong Hire"
+      }
+    ],
+    "custom_attributes": {
+      "start_date": "2024-02-15",
+      "compensation_band": "Senior",
+      "referral_bonus_eligible": true
+    }
+  }
+}

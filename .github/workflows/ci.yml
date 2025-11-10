@@ -1,0 +1,215 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, claude/**]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-type-check:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: humane_job_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./humane_job_web
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./humane_job_web
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        working-directory: ./humane_job_web
+        run: npm run type-check
+
+      - name: Check formatting
+        working-directory: ./humane_job_web
+        run: npm run format:check
+
+  test-web:
+    name: Test Web Application
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: humane_job_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: humane_job_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./humane_job_web
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: ./humane_job_web
+        run: npm run db:generate
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/humane_job_test
+
+      - name: Run unit tests
+        working-directory: ./humane_job_web
+        run: npm run test:ci
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/humane_job_test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY_TEST }}
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./humane_job_web/coverage/lcov.info
+          flags: web
+          name: web-coverage
+
+  test-extension:
+    name: Test Browser Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: humane_job_extension/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./humane_job_extension
+        run: npm ci
+
+      - name: Type check
+        working-directory: ./humane_job_extension
+        run: npm run type-check
+
+      - name: Build extension
+        working-directory: ./humane_job_extension
+        run: npm run build
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: humane_job_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./humane_job_web
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: ./humane_job_web
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        working-directory: ./humane_job_web
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/humane_job_test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY_TEST }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: humane_job_web/playwright-report/
+          retention-days: 7
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Check for npm vulnerabilities
+        working-directory: ./humane_job_web
+        run: npm audit --audit-level=high
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [lint-and-type-check, test-web]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: humane_job_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./humane_job_web
+        run: npm ci
+
+      - name: Build application
+        working-directory: ./humane_job_web
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/humane_job_test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_mock
+          CLERK_SECRET_KEY: sk_test_mock
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: humane_job_web/.next/
+          retention-days: 7

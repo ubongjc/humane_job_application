@@ -1,0 +1,61 @@
+{
+  "event_type": "CandidateStatusChanged",
+  "event_timestamp": "2024-01-20T16:45:00.000Z",
+  "tenant_id": "workday_tenant_001",
+  "job_requisition": {
+    "id": "JR-2024-0123",
+    "title": "Senior Data Scientist",
+    "location": "Boston, MA",
+    "department": "Engineering - Data",
+    "status": "Open",
+    "hiring_manager": {
+      "worker_id": "WD-12345",
+      "name": "Michael Chen"
+    }
+  },
+  "candidate": {
+    "worker_id": null,
+    "application_id": "APP-2024-56789",
+    "first_name": "Sarah",
+    "last_name": "Johnson",
+    "email": "sarah.johnson@example.com",
+    "phone": "+1-555-246-8135",
+    "address": {
+      "city": "Cambridge",
+      "state": "MA",
+      "postal_code": "02139",
+      "country": "USA"
+    },
+    "source": "Employee Referral",
+    "referrer": {
+      "worker_id": "WD-67890",
+      "name": "Tom Williams"
+    }
+  },
+  "application": {
+    "id": "APP-2024-56789",
+    "status": "Hired",
+    "previous_status": "Offer Extended",
+    "submitted_date": "2024-01-10T10:00:00.000Z",
+    "last_updated": "2024-01-20T16:45:00.000Z",
+    "step": {
+      "id": "STEP-HIRE",
+      "name": "Hired",
+      "order": 8
+    }
+  },
+  "disposition": {
+    "reason": "Accepted Offer",
+    "notes": "Strong technical skills, great culture fit",
+    "disposition_date": "2024-01-20T16:45:00.000Z"
+  },
+  "offer": {
+    "id": "OFFER-2024-111",
+    "extended_date": "2024-01-18T14:00:00.000Z",
+    "accepted_date": "2024-01-20T10:30:00.000Z",
+    "start_date": "2024-02-01T09:00:00.000Z",
+    "compensation": {
+      "currency": "USD"
+    }
+  }
+}

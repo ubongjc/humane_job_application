@@ -1,0 +1,61 @@
+{
+  "triggerId": "lever-webhook-001",
+  "signature": "t=1234567890,signatures=abc123",
+  "data": {
+    "opportunityId": "lever-opp-12345",
+    "contactId": "lever-contact-67890",
+    "createdAt": 1705318200000,
+    "stage": "offer",
+    "archived": {
+      "archivedAt": 1705404600000,
+      "reason": "hired"
+    },
+    "contact": {
+      "id": "lever-contact-67890",
+      "name": "Jane Smith",
+      "emails": ["jane.smith@example.com"],
+      "phones": [
+        {
+          "type": "mobile",
+          "value": "+1-555-987-6543"
+        }
+      ],
+      "location": "San Francisco, CA",
+      "links": ["https://linkedin.com/in/janesmith", "https://github.com/janesmith"],
+      "createdAt": 1704713400000
+    },
+    "posting": {
+      "id": "lever-posting-99999",
+      "text": "Senior Product Manager",
+      "state": "published",
+      "distributionChannels": ["linkedin", "indeed"],
+      "reqCode": "PM-2024-001",
+      "createdAt": 1704540600000
+    },
+    "stage": {
+      "id": "lever-stage-offer",
+      "text": "Offer"
+    },
+    "confidentiality": "non-confidential",
+    "location": "San Francisco, CA",
+    "phones": [
+      {
+        "type": "mobile",
+        "value": "+1-555-987-6543"
+      }
+    ],
+    "emails": ["jane.smith@example.com"],
+    "links": ["https://linkedin.com/in/janesmith"],
+    "sourcedBy": {
+      "id": "lever-user-456",
+      "name": "Recruiter Bob"
+    },
+    "owner": {
+      "id": "lever-user-789",
+      "name": "Hiring Manager Alice"
+    },
+    "tags": ["product-management", "saas", "b2b"],
+    "customQuestions": []
+  },
+  "event": "candidateHired"
+}

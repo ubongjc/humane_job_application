@@ -1,0 +1,62 @@
+{
+  "event": "applicant_status_change",
+  "applicant_id": "jazz_app_98765",
+  "job_id": "jazz_job_54321",
+  "timestamp": "2024-01-20T18:30:00Z",
+  "webhook_id": "wh_jazz_001",
+  "applicant": {
+    "id": "jazz_app_98765",
+    "first_name": "David",
+    "last_name": "Martinez",
+    "email": "david.martinez@example.com",
+    "phone": "555-369-2580",
+    "address": {
+      "street": "789 Oak Avenue",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701",
+      "country": "United States"
+    },
+    "source": "Company Website",
+    "rating": 4.5,
+    "tags": ["python", "aws", "kubernetes"],
+    "resume_url": "https://jazzhr.com/resumes/98765.pdf",
+    "created_date": "2024-01-12T09:00:00Z"
+  },
+  "job": {
+    "id": "jazz_job_54321",
+    "title": "DevOps Engineer",
+    "department": "Engineering",
+    "location": "Austin, TX",
+    "status": "Open",
+    "hiring_lead": {
+      "id": "jazz_user_111",
+      "name": "Jennifer Lee",
+      "email": "jennifer.lee@company.com"
+    },
+    "created_date": "2024-01-05T10:00:00Z"
+  },
+  "workflow_step": {
+    "id": "step_hired",
+    "name": "Hired",
+    "category": "Hired",
+    "order": 10
+  },
+  "previous_workflow_step": {
+    "id": "step_offer_accepted",
+    "name": "Offer Accepted",
+    "category": "Offer",
+    "order": 9
+  },
+  "notes": "Excellent technical interview. Strong Kubernetes experience.",
+  "changed_by": {
+    "id": "jazz_user_111",
+    "name": "Jennifer Lee",
+    "email": "jennifer.lee@company.com"
+  },
+  "custom_fields": {
+    "start_date": "2024-02-05",
+    "referral_source": "Employee Referral",
+    "security_clearance": "None Required"
+  }
+}
